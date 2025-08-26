@@ -11,7 +11,7 @@ module "database" {
 module "compute" {
   source = "./modules/compute"
 
-  lambda_role_arn = module.iam.lambda_role_arn
+  lambda_role_arn           = module.iam.lambda_role_arn
   api_gateway_execution_arn = module.api.api_gateway_execution_arn
 }
 
