@@ -13,10 +13,9 @@ resource "aws_apigatewayv2_stage" "websocket_stage" {
 resource "aws_apigatewayv2_integration" "websocket_integration" {
   api_id             = aws_apigatewayv2_api.websocket_api.id
   integration_type   = "AWS_PROXY"
-  integration_uri    = var.lambda_function_arn
+  integration_uri    = var.lambda_function_invoke_arn
   integration_method = "POST"
   content_handling_strategy = "CONVERT_TO_TEXT"
-  payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "connect_route" {
@@ -35,4 +34,14 @@ resource "aws_apigatewayv2_route" "message_route" {
   api_id    = aws_apigatewayv2_api.websocket_api.id
   route_key = "sendMessage"
   target = "integrations/${aws_apigatewayv2_integration.websocket_integration.id}"
+}
+
+resource "aws_apigatewayv2_deployment" "websocket_deployment" {
+  api_id = aws_apigatewayv2_api.websocket_api.id
+
+  depends_on = [
+    aws_apigatewayv2_route.connect_route,
+    aws_apigatewayv2_route.disconnect_route,
+    aws_apigatewayv2_route.message_route
+  ]
 }

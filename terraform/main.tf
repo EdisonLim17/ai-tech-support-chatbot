@@ -12,6 +12,7 @@ module "compute" {
   source = "./modules/compute"
 
   lambda_role_arn = module.iam.lambda_role_arn
+  api_gateway_execution_arn = module.api.api_gateway_execution_arn
 }
 
 module "ai" {
@@ -21,7 +22,7 @@ module "ai" {
 module "api" {
   source = "./modules/api"
 
-  lambda_function_arn = module.compute.lambda_function.arn
+  lambda_function_invoke_arn = module.compute.lambda_function_invoke_arn
 }
 
 module "monitoring" {
