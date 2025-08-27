@@ -3,6 +3,7 @@ resource "aws_lambda_function" "websocket_handler" {
   role          = var.lambda_role_arn
   handler       = "websocket_handler.handler"
   runtime       = "python3.13"
+  timeout = 15
   filename      = data.archive_file.lambda_zip.output_path
 }
 
