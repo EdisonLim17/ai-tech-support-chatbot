@@ -2,6 +2,7 @@ module "iam" {
   source = "./modules/iam"
 
   dynamodb_table_arn = module.database.dynamodb_table_arn
+  api_gateway_execution_arn = module.api.api_gateway_execution_arn
 }
 
 module "database" {
