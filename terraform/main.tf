@@ -16,10 +16,6 @@ module "compute" {
   api_gateway_execution_arn = module.api.api_gateway_execution_arn
 }
 
-module "ai" {
-  source = "./modules/ai"
-}
-
 module "api" {
   source = "./modules/api"
 
