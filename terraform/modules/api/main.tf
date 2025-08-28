@@ -8,6 +8,24 @@ resource "aws_apigatewayv2_stage" "websocket_stage" {
   api_id      = aws_apigatewayv2_api.websocket_api.id
   name        = "prod"
   auto_deploy = true
+
+  route_settings {
+    route_key = "$connect"
+    throttling_burst_limit = 100
+    throttling_rate_limit  = 50
+  }
+  route_settings {
+    route_key = "sendMessage"
+    throttling_burst_limit = 100
+    throttling_rate_limit  = 50
+  }
+
+  depends_on = [
+    aws_apigatewayv2_route.connect_route,
+    aws_apigatewayv2_route.disconnect_route,
+    aws_apigatewayv2_route.message_route,
+    aws_apigatewayv2_deployment.websocket_deployment,
+  ]
 }
 
 resource "aws_apigatewayv2_integration" "websocket_integration" {
