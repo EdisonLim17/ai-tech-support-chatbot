@@ -5,6 +5,12 @@ resource "aws_lambda_function" "websocket_handler" {
   runtime       = "python3.13"
   timeout = 15
   filename      = data.archive_file.lambda_zip.output_path
+
+  environment {
+    variables = {
+      SNS_TOPIC_ARN           = var.sns_topic_arn
+    }
+  }
 }
 
 data "archive_file" "lambda_zip" {

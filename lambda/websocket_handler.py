@@ -1,8 +1,11 @@
+import os
 import json
 import boto3
 import time
 import logging
 from boto3.dynamodb.conditions import Key
+
+import re
 
 MODEL_ID = "us.anthropic.claude-3-5-haiku-20241022-v1:0"
 SYSTEM_PROMPT = (
@@ -51,6 +54,9 @@ tb = ddb.Table('chatbot-conversations')
 
 bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
+sns = boto3.client('sns', region_name='us-east-1')
+ESCALATION_SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -148,6 +154,12 @@ def handler(event, context):
             ConnectionId=conversation_id,
             Data=validatedResponseBody.encode('utf-8')
         )
+
+        # If escalation required, notify human agents
+        if validatedResponse.get("escalation"):
+            logger.info("Escalation required for conversation_id: %s", conversation_id)
+            summary = (userMessage[:1000] + '...') if len(userMessage) > 1000 else userMessage
+            publichEscalation(conversation_id, summary)
 
         return {"statusCode": 200, "body": "Message received! Response: " + validatedResponseBody}
     
@@ -296,11 +308,17 @@ def validate_and_enrich_response(response_text):
         confidence = 0.0
     confidence = max(0.0, min(1.0, confidence))
 
-    # Check for disallowed sensitive phrases (simple heuristic)
-    sensitive_indicators = ["ssn", "social security", "credit card", "cvv", "password", "api key", "secret"]
-    answer_lower = answer.lower()
-    for p in sensitive_indicators:
-        if p in answer_lower:
+    # Check for disallowed sensitive phrases
+    # Patterns matching: SSN/SIN, passport, credit card, ipv4, ipv6
+    sensitive_patterns = [
+        re.compile(r"\b(?:\d{3}-\d{2}-\d{4}|\d{3}-\d{3}-\d{3}|\d{9})\b"),  # SSN/SIN variants
+        re.compile(r"\b[A-Z]{2}\d{6}\b", re.IGNORECASE),  # passport-like: 2 letters + 6 digits
+        re.compile(r"\b(?:\d[ \-]?){13,19}\b"),  # credit-card like sequences 13-19 digits allowing spaces/dashes
+        re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),  # IPv4
+        re.compile(r"\b(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}\b", re.IGNORECASE),  # IPv6
+    ]
+    for p in sensitive_patterns:
+        if p.search(answer):
             # redact and escalate
             return {
                 "answer": "Response contained sensitive content and was redacted. Escalating to human support.",
@@ -341,3 +359,19 @@ def validate_and_enrich_response(response_text):
 
     return validated
 
+
+def publichEscalation(conversation_id, summary):
+    if not ESCALATION_SNS_TOPIC_ARN:
+        logger.error("Escalation SNS topic ARN not configured.")
+        return
+
+    message = f"Conversation {conversation_id} requires escalation.\nSummary: {summary}"
+    try:
+        sns.publish(
+            TopicArn=ESCALATION_SNS_TOPIC_ARN,
+            Message=message,
+            Subject=f"Support Conversation Escalation: {conversation_id}"
+        )
+        logger.info("Escalation notification sent for conversation_id: %s", conversation_id)
+    except Exception as e:
+        logger.error("Error sending escalation notification: %s", str(e))
