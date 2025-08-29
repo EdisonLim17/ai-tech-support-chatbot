@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 import time
@@ -53,6 +54,9 @@ tb = ddb.Table('chatbot-conversations')
 
 bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
+sns = boto3.client('sns', region_name='us-east-1')
+ESCALATION_SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -150,6 +154,12 @@ def handler(event, context):
             ConnectionId=conversation_id,
             Data=validatedResponseBody.encode('utf-8')
         )
+
+        # If escalation required, notify human agents
+        if validatedResponse.get("escalation"):
+            logger.info("Escalation required for conversation_id: %s", conversation_id)
+            summary = (userMessage[:1000] + '...') if len(userMessage) > 1000 else userMessage
+            publichEscalation(conversation_id, summary)
 
         return {"statusCode": 200, "body": "Message received! Response: " + validatedResponseBody}
     
@@ -349,3 +359,19 @@ def validate_and_enrich_response(response_text):
 
     return validated
 
+
+def publichEscalation(conversation_id, summary):
+    if not ESCALATION_SNS_TOPIC_ARN:
+        logger.error("Escalation SNS topic ARN not configured.")
+        return
+
+    message = f"Conversation {conversation_id} requires escalation.\nSummary: {summary}"
+    try:
+        sns.publish(
+            TopicArn=ESCALATION_SNS_TOPIC_ARN,
+            Message=message,
+            Subject=f"Support Conversation Escalation: {conversation_id}"
+        )
+        logger.info("Escalation notification sent for conversation_id: %s", conversation_id)
+    except Exception as e:
+        logger.error("Error sending escalation notification: %s", str(e))
