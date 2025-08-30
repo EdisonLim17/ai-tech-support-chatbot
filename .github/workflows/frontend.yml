@@ -1,0 +1,74 @@
+name: "Frontend"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'frontend/**'
+  workflow_run:
+    workflows: ["Terraform"]
+    types: [completed]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'frontend/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Frontend to S3
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::415730361496:role/OIDC-Role-Role-IIhBuobxdcmm
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+          terraform_wrapper: false
+
+      - name: Get Terraform Outputs
+        working-directory: terraform
+        run: |
+          terraform init
+          echo "WEBSOCKET_URL=$(terraform output -raw websocket_api_endpoint)" >> $GITHUB_ENV
+          echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_ENV
+
+      - name: Generate Config File
+        run: |
+          cat > ./frontend/src/config.js << EOF
+          window.CONFIG = {
+            WEBSOCKET_URL: "${{ env.WEBSOCKET_URL }}"
+          };
+          EOF
+          echo "Generated config.js with WebSocket URL: ${{ env.WEBSOCKET_URL }}"
+        
+      - name: Sync S3
+        run: |
+          aws s3 sync ./frontend/src s3://${{ env.S3_BUCKET }} --delete --follow-symlinks
+
+      - name: Invalidate CloudFront Cache
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION_ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
+          PATHS: "/*"
+          AWS_REGION: us-east-1
