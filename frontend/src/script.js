@@ -154,10 +154,38 @@ class ChatBot {
     handleMessage(data) {
         this.hideTypingIndicator();
         
-        // The Lambda sends raw UTF-8 text, not JSON
+        try {
+            // Try to parse as JSON first (new structured format)
+            const response = JSON.parse(data);
+            
+            if (response.chatbotResponse && response.fullResponse) {
+                // New structured format
+                const message = response.chatbotResponse;
+                const fullResponse = response.fullResponse;
+                
+                console.log('📋 Full response metadata:', fullResponse);
+                
+                // Use the escalation flag from the structured response
+                const isEscalation = fullResponse.escalation === true;
+                
+                this.addMessage(message, 'bot');
+                
+                if (isEscalation) {
+                    console.log('🚨 Escalation detected:', fullResponse.tags);
+                    this.showEscalationBanner();
+                }
+                
+                return;
+            }
+        } catch (error) {
+            // If JSON parsing fails, fall back to plain text handling
+            console.log('📝 Received plain text response, parsing as text');
+        }
+        
+        // Fallback: handle as plain text (legacy format)
         const message = typeof data === 'string' ? data : data.toString();
         
-        // Check if this looks like an escalation response
+        // Check if this looks like an escalation response (text-based detection)
         const isEscalation = message.toLowerCase().includes('human support') || 
                            message.toLowerCase().includes('escalat') ||
                            message.toLowerCase().includes('forwarded to');

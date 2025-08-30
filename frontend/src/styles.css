@@ -25,7 +25,7 @@
 
 [data-theme="dark"] {
     /* Dark theme variables */
-    --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #7c2d92 100%);
+    --bg-gradient: linear-gradient(135deg, #223956 0%, #5a1b3b 100%);
     --chat-bg: #1f2937;
     --text-primary: #f9fafb;
     --text-secondary: #d1d5db;
