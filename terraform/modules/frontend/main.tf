@@ -43,6 +43,7 @@ resource "aws_acm_certificate_validation" "frontend_cert" {
 # S3 bucket for frontend
 resource "aws_s3_bucket" "frontend_bucket" {
   bucket = var.s3_bucket_name
+  force_destroy = true
 }
 
 # S3 bucket public access block
