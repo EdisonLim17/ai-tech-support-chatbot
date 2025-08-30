@@ -33,6 +33,7 @@ class ChatBot {
         this.updateCharCounter();
     }
 
+    // Fetch WebSocket URL from config.js or fallback
     getWebSocketUrl() {
         if (window.CONFIG && window.CONFIG.WEBSOCKET_URL) {
             return window.CONFIG.WEBSOCKET_URL;
