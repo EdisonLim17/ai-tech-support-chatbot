@@ -5,5 +5,5 @@ output "api_gateway_execution_arn" {
 
 output "websocket_url" {
   description = "The URL of the WebSocket API"
-  value       = aws_apigatewayv2_api.websocket_api.api_endpoint
+  value       = "${aws_apigatewayv2_api.websocket_api.api_endpoint}/${aws_apigatewayv2_stage.websocket_stage.name}"
 }
