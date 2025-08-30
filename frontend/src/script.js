@@ -1,7 +1,6 @@
 class ChatBot {
     constructor() {
-        // WebSocket configuration - update this with your API Gateway WebSocket URL
-        this.wsUrl = 'wss://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/dev';
+        this.wsUrl = this.getWebSocketUrl();
         this.ws = null;
         this.isConnected = false;
         this.reconnectAttempts = 0;
@@ -32,6 +31,15 @@ class ChatBot {
         this.initializeTheme();
         this.connect();
         this.updateCharCounter();
+    }
+
+    getWebSocketUrl() {
+        if (window.CONFIG && window.CONFIG.WEBSOCKET_URL) {
+            return window.CONFIG.WEBSOCKET_URL;
+        } else {
+            console.error('WebSocket URL not found in config.js. Please set CONFIG.WEBSOCKET_URL.');
+            return 'wss://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/dev'; // Fallback URL
+        }
     }
     
     setupEventListeners() {
