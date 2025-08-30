@@ -32,3 +32,11 @@ module "notifications" {
 
   sns_delivery_status_role_arn = module.iam.sns_delivery_status_role_arn
 }
+
+module "frontend" {
+  source = "./modules/frontend"
+
+  providers = {
+    aws.general_account = aws.general_account
+  }
+}

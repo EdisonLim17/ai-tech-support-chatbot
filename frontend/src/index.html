@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechAssist - AI Support Chat</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-content">
+                <div class="bot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="header-info">
+                    <h1>TechAssist</h1>
+                    <span class="status-indicator">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span class="status-text" id="statusText">Connecting...</span>
+                    </span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="clearChat" title="Clear conversation">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-icon" id="themeToggle" title="Toggle dark/light mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-message">
+                <div class="bot-avatar-large">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h2>Welcome to TechAssist</h2>
+                <p>I'm here to help you with technical support, account issues, and product guidance. How can I assist you today?</p>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            <div class="message bot-message">
+                <div class="avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="Type your message here..." 
+                    rows="1"
+                    maxlength="2000"
+                ></textarea>
+                <button id="sendButton" class="send-button" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span class="char-counter" id="charCounter">0/2000</span>
+                <span class="disclaimer">AI assistant - responses may require human verification</span>
+            </div>
+        </div>
+
+        <!-- Connection Alert -->
+        <div class="alert alert-error" id="connectionAlert" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Connection lost. Attempting to reconnect...</span>
+        </div>
+
+        <!-- Escalation Banner -->
+        <div class="alert alert-info" id="escalationBanner" style="display: none;">
+            <i class="fas fa-user-headset"></i>
+            <span>Your request has been forwarded to a human support agent.</span>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
