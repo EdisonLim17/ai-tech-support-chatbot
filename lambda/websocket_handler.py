@@ -150,9 +150,13 @@ def handler(event, context):
             validatedResponseBody = validatedResponse.get("answer", "")
 
         #Send response back to client
+        response_payload = {
+            "chatbotResponse": validatedResponseBody,
+            "fullResponse": validatedResponse
+        }
         mgmt_api.post_to_connection(
             ConnectionId=conversation_id,
-            Data=validatedResponseBody.encode('utf-8')
+            Data=json.dumps(response_payload).encode('utf-8')
         )
 
         # If escalation required, notify human agents
@@ -161,7 +165,7 @@ def handler(event, context):
             summary = (userMessage[:1000] + '...') if len(userMessage) > 1000 else userMessage
             publichEscalation(conversation_id, summary)
 
-        return {"statusCode": 200, "body": "Message received! Response: " + validatedResponseBody}
+        return {"statusCode": 200, "body": "Message received! Response sent to client."}
     
     else:
         # Handle unknown route
