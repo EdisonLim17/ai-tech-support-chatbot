@@ -42,7 +42,7 @@ resource "aws_acm_certificate_validation" "frontend_cert" {
 
 # S3 bucket for frontend
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "aitechsupportchatbot-frontend"
+  bucket = var.s3_bucket_name
 }
 
 # S3 bucket public access block
@@ -98,7 +98,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   is_ipv6_enabled     = true
   comment             = "AI Tech Support Chatbot Frontend"
   default_root_object = "index.html"
-  aliases             = ["chatbot.edisonlim.ca"]
+  aliases             = [var.subdomain_name]
 
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
