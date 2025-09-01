@@ -41,7 +41,7 @@ SYSTEM_PROMPT = (
     "}\n\n"
 
     "CRITICAL formatting rules for JSON compatibility:\n"
-    "- Use ONLY ASCII characters (no Unicode symbols like •, —, ", ", etc.)\n"
+    "- Use ONLY ASCII characters\n"
     "- Use regular dashes (-) for lists, never bullet points\n"
     "- Use straight quotes (\") never smart quotes\n\n"
 
