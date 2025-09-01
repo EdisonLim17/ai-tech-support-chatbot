@@ -6,6 +6,8 @@ resource "aws_lambda_function" "websocket_handler" {
   timeout = 15
   filename      = data.archive_file.lambda_zip.output_path
 
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+
   environment {
     variables = {
       SNS_TOPIC_ARN           = var.sns_topic_arn
@@ -15,8 +17,8 @@ resource "aws_lambda_function" "websocket_handler" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file  = "${path.module}/../../../lambda/websocket_handler.py"
-  output_path = "${path.module}/../../../lambda/websocket_handler.zip"
+  source_dir  = "${path.module}/../../../lambda"
+  output_path = "${path.module}/builds/websocket_handler.zip"
 }
 
 resource "aws_lambda_permission" "allow_apigw_invoke" {
