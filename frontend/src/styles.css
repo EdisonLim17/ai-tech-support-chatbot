@@ -249,16 +249,17 @@ body {
 }
 
 .bot-message .avatar {
-    background: linear-gradient(135deg, #60a5fa 0%, #ec4899 100%);
+    background: #ec4899;
     color: white;
     margin-right: 12px;
 }
 
 .user-message .avatar {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: #60a5fa;
     color: white;
     margin-left: 12px;
     order: 2;
+    align-self: flex-end;
 }
 
 .message-content {
@@ -337,8 +338,8 @@ body {
 .input-wrapper {
     display: flex;
     gap: 12px;
-    align-items: flex-end;
-    padding: 12px 16px;
+    align-items: center;
+    padding: 8px 12px;
     background: var(--input-bg);
     border: 2px solid var(--input-border);
     border-radius: 16px;
@@ -360,7 +361,7 @@ body {
     line-height: 1.5;
     resize: none;
     outline: none;
-    min-height: 24px;
+    min-height: 20px;
     max-height: 120px;
     color: var(--text-primary);
 }
@@ -370,11 +371,11 @@ body {
 }
 
 .send-button {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     background: linear-gradient(135deg, #60a5fa 0%, #ec4899 100%);
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: white;
     cursor: pointer;
     display: flex;
