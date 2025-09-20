@@ -1,6 +1,6 @@
-# AI Tech Support Chatbot
+# TechAssist (AI Tech Support Chatbot)
 
-AI Tech Support Chatbot is a cloud-native, enterprise-grade serverless application that delivers instant technical support responses to users. Built on Amazon Bedrock with the Claude 3.5 Haiku model, it intelligently answers questions, redacts sensitive information, validates JSON outputs, and escalates unresolved issues to human agents—all while enforcing company policies, tone guidelines, and strict business rules.
+TechAssist is a cloud-native, enterprise-grade serverless application that delivers instant technical support responses to users. Built on Amazon Bedrock with the Claude 3.5 Haiku model, it intelligently answers questions, redacts sensitive information, validates JSON outputs, and escalates unresolved issues to human agents—all while enforcing company policies, tone guidelines, and strict business rules.
 
 The architecture prioritizes high availability, scalability, and security, capable of handling millions of concurrent connections with 99.95 % uptime and fast response times. Infrastructure is fully automated with Terraform and GitHub Actions, requiring zero manual configuration.
 
