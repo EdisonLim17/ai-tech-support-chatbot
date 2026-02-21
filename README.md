@@ -6,9 +6,9 @@ The architecture prioritizes high availability, scalability, and security, capab
 
 ---
 
-## 🌐 Live Site
+## 🌐 Video Demo
 
-[https://chatbot.edisonlim.ca](https://chatbot.edisonlim.ca)
+[Watch the demo](https://www.youtube.com/watch?v=5g3UpTpsSuo)
 
 ---
 
